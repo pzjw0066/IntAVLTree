@@ -1,0 +1,243 @@
+/**
+* @file    IntAVLTree.c
+* @brief   int类型AVL树实现
+* @author  pzjw0066
+* @date    2025/01/07
+*/
+
+#include <stdlib.h>
+#include "IntAVLTree.h"
+
+/**
+* @brief 获取节点的高度属性
+* @param root 要获取高度属性的节点指针
+* @return 高度属性
+* @note NULL节点的是-1
+*/
+static inline int GetHeight(IntAVLTreeNodeStruct *root)
+{
+    if (!root)
+        return -1;
+
+    return root->height;
+}
+
+/**
+* @brief 更新节点的高度属性（NULL节点的是-1）
+* @param root 要更新高度属性的节点指针
+*/
+static inline void UpdateHeight(IntAVLTreeNodeStruct *root)
+{
+    int left_height = GetHeight(root->left), right_height = GetHeight(root->right);
+
+    root->height = (left_height > right_height ? left_height : right_height) + 1;
+}
+
+/**
+* @brief 计算节点的平衡因子
+* @param root 要计算平衡因子的节点指针
+* @return 节点的平衡因子
+*/
+static inline int GetBalanceFactor(IntAVLTreeNodeStruct *root)
+{
+    return root ? GetHeight(root->left) -  GetHeight(root->right) : 0;
+}
+
+/**
+* @brief AVL节点的构造函数
+* @param left 节点的左子树节点
+* @param right 节点的右子树节点
+* @param value 该节点存储的值
+* @return 该节点的指针
+*/
+static inline IntAVLTreeNodeStruct *CreateIntAVLTreeNode(IntAVLTreeNodeStruct *left, IntAVLTreeNodeStruct *right, int value)
+{
+    IntAVLTreeNodeStruct *node = malloc(sizeof(IntAVLTreeNodeStruct));
+
+    if (!node)
+        return NULL;
+
+    node->left = left;
+    node->right = right;
+    node->value = value;
+
+    if (left || right)
+        UpdateHeight(node);
+    else
+        node->height = 0;
+
+    return node;
+}
+
+/**
+* @brief 右旋
+* @param root 要右旋的节点指针
+* @return 右旋后的节点指针
+*/
+static inline IntAVLTreeNodeStruct *RightRotate(IntAVLTreeNodeStruct *root)
+{
+    IntAVLTreeNodeStruct *child = root->left, *grand_child = child->right;
+
+    child->right = root;
+    root->left = grand_child;
+    
+    UpdateHeight(root);
+    UpdateHeight(child);
+
+    return child;
+}
+
+/**
+* @brief 左旋
+* @param root 要左旋的节点指针
+* @return 左旋后的节点指针
+*/
+static inline IntAVLTreeNodeStruct *LeftRotate(IntAVLTreeNodeStruct *root)
+{
+    IntAVLTreeNodeStruct *child = root->right, *grand_child = child->left;
+
+    child->left = root;
+    root->right = grand_child;
+
+    UpdateHeight(root);
+    UpdateHeight(child);
+
+    return child;
+}
+
+/**
+* @brief 通过节点的平衡因子自动选择合适的旋转方式
+* @param root 要旋转的节点指针
+* @return 旋转后的节点指针
+*/
+static IntAVLTreeNodeStruct *Rotate(IntAVLTreeNodeStruct *root)
+{
+    int balance_factor = GetBalanceFactor(root);
+
+    // L_型
+    if (balance_factor > 1)
+    {
+        // LL型
+        if (GetBalanceFactor(root->left) >= 0)
+            return RightRotate(root);
+        // LR型
+        else
+        {
+            root->left = LeftRotate(root->left);
+            return RightRotate(root);
+        }
+    }
+
+    // R_型
+    if (balance_factor < -1)
+    {
+        // RR型
+        if (GetBalanceFactor(root->right) <= 0)
+            return LeftRotate(root);
+        // RL型
+        else
+        {
+            root->right = RightRotate(root->right);
+            return LeftRotate(root);
+        }
+    }
+
+    return root;
+}
+
+IntAVLTreeNodeStruct *InsertIntoIntAVLTree(IntAVLTreeNodeStruct *root, int value)
+{
+    if (!root)
+        return CreateIntAVLTreeNode(NULL, NULL, value);
+
+    if (root->value == value)
+        return root;
+    else if (root->value > value)
+        root->left = InsertIntoIntAVLTree(root->left, value);
+    else
+        root->right = InsertIntoIntAVLTree(root->right, value);
+
+    UpdateHeight(root);
+
+    return Rotate(root);
+}
+
+IntAVLTreeNodeStruct *RemoveIntAVLTreeNode(IntAVLTreeNodeStruct *root, int value)
+{
+    if (!root)
+        return NULL;
+
+    if (root->value == value)
+    {
+        IntAVLTreeNodeStruct *child;
+
+        // root节点至少有一个NULL节点，即root节点的度可能为0或1
+        if (!root->left || !root->right)
+        {
+            IntAVLTreeNodeStruct *child = root->left;
+
+            child = root->right ? root->right : NULL;
+            
+            // 度为0，直接删除，即返回NULL节点
+            if (!child)
+                return NULL;
+            
+            // 度为1，将本身替换成孩子节点，即返回孩子节点（之后需更新高度）
+            root = child;
+        }
+        // root节点的度为2
+        else
+        {
+            // 查找中序遍历的下一个节点
+            child = root->right;
+            while (child->left)
+                child = child->left;
+
+            // 把其值赋给根节点的右子节点，并递归删除此节点
+            int child_val = child->value;
+            root->right = RemoveIntAVLTreeNode(root->right, child_val);
+            root->value = child_val;
+        }
+    }
+    else if (root->value > value)
+        root->left = RemoveIntAVLTreeNode(root->left, value);
+    else
+        root->right = RemoveIntAVLTreeNode(root->right, value);
+
+    UpdateHeight(root);
+
+    return Rotate(root);
+}
+
+void DeleteIntAVLTree(IntAVLTreeNodeStruct *root)
+{
+    if (!root)
+        return;
+
+    DeleteIntAVLTree(root->left);
+    DeleteIntAVLTree(root->right);
+    free(root);
+}
+
+void InorderTraversal(IntAVLTreeNodeStruct *root, void (*pf)(IntAVLTreeNodeStruct*))
+{
+    if (!root)
+        return;
+
+    InorderTraversal(root->left, pf);
+    pf(root);
+    InorderTraversal(root->right, pf);
+}
+
+IntAVLTreeNodeStruct *SearchInIntAVLTree(IntAVLTreeNodeStruct *root, int object)
+{
+    while (root)
+    {
+        if (root->value == object)
+            break;
+
+        root = root->value > object ? root->left : root->right;
+    }
+
+    return root;
+}

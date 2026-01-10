@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "IntAVLTree.h"
 
-static void PrintNode(IntAVLTreeNodeStruct *node)
+static void PrintNode(const IntAVLTreeNodeStruct *node)
 {
     printf("%d ", node->value);
 }

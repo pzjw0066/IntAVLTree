@@ -2,7 +2,7 @@
 #include "IntAVLTree.h"
 
 // 获取节点的高度属性（NULL节点的是-1）
-static inline int GetHeight(IntAVLTreeNodeStruct *root)
+static inline int GetHeight(const IntAVLTreeNodeStruct *root)
 {
     if (!root)
         return -1;
@@ -19,13 +19,13 @@ static inline void UpdateHeight(IntAVLTreeNodeStruct *root)
 }
 
 // 计算节点的平衡因子
-static inline int GetBalanceFactor(IntAVLTreeNodeStruct *root)
+static inline int GetBalanceFactor(const IntAVLTreeNodeStruct *root)
 {
     return root ? GetHeight(root->left) -  GetHeight(root->right) : 0;
 }
 
 // AVL节点的构造函数
-static inline IntAVLTreeNodeStruct *CreateIntAVLTreeNode(int value)
+static inline IntAVLTreeNodeStruct *CreateIntAVLTreeNode(const int value)
 {
     IntAVLTreeNodeStruct *node = malloc(sizeof(IntAVLTreeNodeStruct));
 
@@ -105,7 +105,7 @@ static IntAVLTreeNodeStruct *Rotate(IntAVLTreeNodeStruct *root)
     return root;
 }
 
-IntAVLTreeNodeStruct *InsertIntoIntAVLTree(IntAVLTreeNodeStruct *root, int value)
+IntAVLTreeNodeStruct *InsertIntoIntAVLTree(IntAVLTreeNodeStruct *root, const int value)
 {
     if (!root)
         return CreateIntAVLTreeNode(value);
@@ -122,7 +122,7 @@ IntAVLTreeNodeStruct *InsertIntoIntAVLTree(IntAVLTreeNodeStruct *root, int value
     return Rotate(root);
 }
 
-IntAVLTreeNodeStruct *RemoveIntAVLTreeNode(IntAVLTreeNodeStruct *root, int value)
+IntAVLTreeNodeStruct *RemoveIntAVLTreeNode(IntAVLTreeNodeStruct *root, const int value)
 {
     if (!root)
         return NULL;
@@ -179,7 +179,7 @@ void DeleteIntAVLTree(IntAVLTreeNodeStruct *root)
     free(root);
 }
 
-void InorderTraversal(IntAVLTreeNodeStruct *root, void (*pf)(IntAVLTreeNodeStruct*))
+void InorderTraversal(const IntAVLTreeNodeStruct *root, void (*pf)(const IntAVLTreeNodeStruct*))
 {
     if (!root)
         return;
@@ -189,7 +189,7 @@ void InorderTraversal(IntAVLTreeNodeStruct *root, void (*pf)(IntAVLTreeNodeStruc
     InorderTraversal(root->right, pf);
 }
 
-IntAVLTreeNodeStruct *SearchInIntAVLTree(IntAVLTreeNodeStruct *root, int object)
+const IntAVLTreeNodeStruct *SearchInIntAVLTree(const IntAVLTreeNodeStruct *root, const int object)
 {
     while (root)
     {

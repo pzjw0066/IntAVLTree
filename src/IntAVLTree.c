@@ -1,19 +1,7 @@
-/**
-* @file    IntAVLTree.c
-* @brief   int类型AVL树实现
-* @author  pzjw0066
-* @date    2025/01/07
-*/
-
 #include <stdlib.h>
 #include "IntAVLTree.h"
 
-/**
-* @brief 获取节点的高度属性
-* @param root 要获取高度属性的节点指针
-* @return 高度属性
-* @note NULL节点的是-1
-*/
+// 获取节点的高度属性（NULL节点的是-1）
 static inline int GetHeight(IntAVLTreeNodeStruct *root)
 {
     if (!root)
@@ -22,10 +10,7 @@ static inline int GetHeight(IntAVLTreeNodeStruct *root)
     return root->height;
 }
 
-/**
-* @brief 更新节点的高度属性（NULL节点的是-1）
-* @param root 要更新高度属性的节点指针
-*/
+// 更新节点的高度属性
 static inline void UpdateHeight(IntAVLTreeNodeStruct *root)
 {
     int left_height = GetHeight(root->left), right_height = GetHeight(root->right);
@@ -33,23 +18,13 @@ static inline void UpdateHeight(IntAVLTreeNodeStruct *root)
     root->height = (left_height > right_height ? left_height : right_height) + 1;
 }
 
-/**
-* @brief 计算节点的平衡因子
-* @param root 要计算平衡因子的节点指针
-* @return 节点的平衡因子
-*/
+// 计算节点的平衡因子
 static inline int GetBalanceFactor(IntAVLTreeNodeStruct *root)
 {
     return root ? GetHeight(root->left) -  GetHeight(root->right) : 0;
 }
 
-/**
-* @brief AVL节点的构造函数
-* @param left 节点的左子树节点
-* @param right 节点的右子树节点
-* @param value 该节点存储的值
-* @return 该节点的指针
-*/
+// AVL节点的构造函数
 static inline IntAVLTreeNodeStruct *CreateIntAVLTreeNode(IntAVLTreeNodeStruct *left, IntAVLTreeNodeStruct *right, int value)
 {
     IntAVLTreeNodeStruct *node = malloc(sizeof(IntAVLTreeNodeStruct));
@@ -69,11 +44,7 @@ static inline IntAVLTreeNodeStruct *CreateIntAVLTreeNode(IntAVLTreeNodeStruct *l
     return node;
 }
 
-/**
-* @brief 右旋
-* @param root 要右旋的节点指针
-* @return 右旋后的节点指针
-*/
+// 右旋
 static inline IntAVLTreeNodeStruct *RightRotate(IntAVLTreeNodeStruct *root)
 {
     IntAVLTreeNodeStruct *child = root->left, *grand_child = child->right;
@@ -87,11 +58,7 @@ static inline IntAVLTreeNodeStruct *RightRotate(IntAVLTreeNodeStruct *root)
     return child;
 }
 
-/**
-* @brief 左旋
-* @param root 要左旋的节点指针
-* @return 左旋后的节点指针
-*/
+// 左旋
 static inline IntAVLTreeNodeStruct *LeftRotate(IntAVLTreeNodeStruct *root)
 {
     IntAVLTreeNodeStruct *child = root->right, *grand_child = child->left;
@@ -105,11 +72,7 @@ static inline IntAVLTreeNodeStruct *LeftRotate(IntAVLTreeNodeStruct *root)
     return child;
 }
 
-/**
-* @brief 通过节点的平衡因子自动选择合适的旋转方式
-* @param root 要旋转的节点指针
-* @return 旋转后的节点指针
-*/
+// 通过节点的平衡因子自动选择合适的旋转方式
 static IntAVLTreeNodeStruct *Rotate(IntAVLTreeNodeStruct *root)
 {
     int balance_factor = GetBalanceFactor(root);

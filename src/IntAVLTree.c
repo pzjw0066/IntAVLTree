@@ -25,21 +25,18 @@ static inline int GetBalanceFactor(IntAVLTreeNodeStruct *root)
 }
 
 // AVL节点的构造函数
-static inline IntAVLTreeNodeStruct *CreateIntAVLTreeNode(IntAVLTreeNodeStruct *left, IntAVLTreeNodeStruct *right, int value)
+static inline IntAVLTreeNodeStruct *CreateIntAVLTreeNode(int value)
 {
     IntAVLTreeNodeStruct *node = malloc(sizeof(IntAVLTreeNodeStruct));
 
     if (!node)
         return NULL;
 
-    node->left = left;
-    node->right = right;
+    node->left = NULL;
+    node->right = NULL;
     node->value = value;
 
-    if (left || right)
-        UpdateHeight(node);
-    else
-        node->height = 0;
+    node->height = 0;
 
     return node;
 }
@@ -111,7 +108,7 @@ static IntAVLTreeNodeStruct *Rotate(IntAVLTreeNodeStruct *root)
 IntAVLTreeNodeStruct *InsertIntoIntAVLTree(IntAVLTreeNodeStruct *root, int value)
 {
     if (!root)
-        return CreateIntAVLTreeNode(NULL, NULL, value);
+        return CreateIntAVLTreeNode(value);
 
     if (root->value == value)
         return root;
@@ -137,7 +134,7 @@ IntAVLTreeNodeStruct *RemoveIntAVLTreeNode(IntAVLTreeNodeStruct *root, int value
         // root节点至少有一个NULL节点，即root节点的度可能为0或1
         if (!root->left || !root->right)
         {
-            IntAVLTreeNodeStruct *child = root->left;
+            child = NULL;
 
             child = root->right ? root->right : NULL;
             

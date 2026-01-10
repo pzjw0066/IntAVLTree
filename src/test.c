@@ -1,10 +1,3 @@
-/**
-* @file    test.c
-* @brief   AVL树测试文件
-* @author  pzjw0066
-* @date    2025/01/07
-*/
-
 #include <stdio.h>
 #include "IntAVLTree.h"
 
